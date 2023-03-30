@@ -1,0 +1,290 @@
+/* Start of Code */
+
+/* Create BUILDING table */
+
+CREATE TABLE BUILDING (
+BuildingCode CHAR (2) NOT NULL,
+BuildingName CHAR (25) NOT NULL,
+BuildingAddress VARCHAR (200) NOT NULL,
+CONSTRAINT BuildingPK PRIMARY KEY (BuildingCode)
+);
+
+/*Insert records into BUILDING*/
+
+INSERT INTO BUILDING (BuildingCode, BuildingName, BuildingAddress)
+      VALUES ('EH', 'Einstein Hall', '703 Ridge Ln');
+INSERT INTO BUILDING (BuildingCode, BuildingName, BuildingAddress)
+      VALUES ('CH', 'Cremer Hall', '780 Corn Dr');
+INSERT INTO BUILDING (BuildingCode, BuildingName, BuildingAddress)
+   VALUES ('FH', 'Faraday Hall', '110 Ritter Ave');
+INSERT INTO BUILDING (BuildingCode, BuildingName, BuildingAddress)
+      VALUES ('SU','Student Union', '35 Jefferson Ave');
+INSERT INTO BUILDING (BuildingCode, BuildingName, BuildingAddress)
+   VALUES ('MH','Mauer Hall', '455 Carlton St');
+
+/* Create ROOM table */
+
+CREATE TABLE ROOM (
+RoomCode CHAR (4) NOT NULL,
+RoomCapacity INT  NOT NULL,
+BuildingCode CHAR (2) NOT NULL,
+CONSTRAINT RoomPK PRIMARY KEY(RoomCode),
+CONSTRAINT RoomFK FOREIGN KEY (BuildingCode) REFERENCES BUILDING (BuildingCode)
+                                                ON UPDATE CASCADE
+                                                ON DELETE NO ACTION
+);
+
+/*Insert records into ROOM*/
+
+INSERT INTO ROOM  (RoomCode, RoomCapacity, BuildingCode)
+      VALUES ('1000', 60, 'CH');
+INSERT INTO ROOM  (RoomCode, RoomCapacity, BuildingCode)
+   VALUES ('1001', 150, 'MH');
+INSERT INTO ROOM  (RoomCode, RoomCapacity, BuildingCode)
+   VALUES ('1002', 55, 'CH');
+INSERT INTO ROOM  (RoomCode, RoomCapacity, BuildingCode)
+   VALUES('1003', 15, 'EH');
+INSERT INTO ROOM  (RoomCode, RoomCapacity, BuildingCode)
+   VALUES('1004', 100, 'CH');
+INSERT INTO ROOM  (RoomCode, RoomCapacity, BuildingCode)
+   VALUES('1005', 90, 'EH');
+
+/* Create SCHOOL table */
+
+CREATE TABLE SCHOOL (
+SchoolCode CHAR (3) NOT NULL,
+SchoolName VARCHAR (25) NOT NULL,
+SchoolAddress VARCHAR (100) NOT NULL,
+CONSTRAINT SchoolPK PRIMARY KEY (SchoolCode)
+);
+
+/*Insert records into SCHOOL*/
+
+INSERT INTO SCHOOL (SchoolCode, SchoolName, SchoolAddress)
+      VALUES ('COB', 'College of Business', 'Campus Box 112');  
+INSERT INTO SCHOOL (SchoolCode, SchoolName, SchoolAddress)
+      VALUES ('COE', 'College of Engineering', 'Campus Box 109');
+INSERT INTO SCHOOL (SchoolCode, SchoolName, SchoolAddress)
+      VALUES ('COS', 'College of Science', 'Campus Box 212');  
+INSERT INTO SCHOOL (SchoolCode, SchoolName, SchoolAddress)
+      VALUES ('SOA', 'School of Arts', 'Campus Box 507');
+INSERT INTO SCHOOL (SchoolCode, SchoolName, SchoolAddress)
+      VALUES ('SOE', 'School of Education', 'Campus Box 340');
+
+/* Create the intersection SCHL_BLDG table */
+
+CREATE TABLE SCHL_BLDG (
+SchoolBldgID CHAR (3) NOT NULL,
+BuildingCode CHAR (2) NOT NULL,
+SchoolCode CHAR (3) NOT NULL,
+SizeSqFeet  INT NOT NULL,
+CONSTRAINT Schl_BldgPK  PRIMARY KEY (SchoolBldgID),
+CONSTRAINT Schl_BldgFK1 FOREIGN KEY (BuildingCode) REFERENCES BUILDING (BuildingCode)
+                                                   ON UPDATE CASCADE
+                                                   ON DELETE NO ACTION,
+CONSTRAINT Schl_BldgFK2 FOREIGN KEY (SchoolCode) REFERENCES SCHOOL (SchoolCode)
+                                                 ON UPDATE CASCADE
+                                                 ON DELETE NO ACTION
+);
+
+/*Insert records into SCHL_BLDG*/
+
+INSERT INTO SCHL_BLDG (SchoolBldgID, BuildingCode, SchoolCode, SizeSqFeet)
+      VALUES ('200', 'CH', 'COB', 15000);
+INSERT INTO SCHL_BLDG (SchoolBldgID, BuildingCode, SchoolCode, SizeSqFeet)
+      VALUES ('201', 'CH', 'COS', 20000);
+INSERT INTO SCHL_BLDG (SchoolBldgID, BuildingCode, SchoolCode, SizeSqFeet)
+      VALUES ('202', 'CH', 'SOE', 10000);
+INSERT INTO SCHL_BLDG (SchoolBldgID, BuildingCode, SchoolCode, SizeSqFeet)
+      VALUES ('203', 'MH', 'COB', 25000);
+INSERT INTO SCHL_BLDG (SchoolBldgID, BuildingCode, SchoolCode, SizeSqFeet)
+      VALUES('204', 'MH', 'COS', 13000);
+INSERT INTO SCHL_BLDG (SchoolBldgID, BuildingCode, SchoolCode, SizeSqFeet)
+      VALUES ('205', 'FH', 'COB', 5000);
+
+/* Create the DEPARTMENT table */
+
+CREATE TABLE DEPARTMENT (
+DeptCode    VARCHAR (4) NOT NULL,
+DeptName    VARCHAR (50) NOT NULL,
+DeptAddress VARCHAR (200) NULL,
+SchoolCode  CHAR (3) NOT NULL,
+CONSTRAINT DepartmentPK PRIMARY KEY (DeptCode),
+CONSTRAINT DepartmentFK FOREIGN KEY (SchoolCode) REFERENCES SCHOOL (SchoolCode)
+                                                ON UPDATE CASCADE
+                                                ON DELETE NO ACTION
+);
+
+/*Insert records into DEPARTMENT*/
+
+INSERT INTO DEPARTMENT (DeptCode, DeptName, DeptAddress, SchoolCode)
+                  VALUES ('ACCT', 'Accounting', 'Campus Box 112A', 'COB');
+INSERT INTO DEPARTMENT (DeptCode, DeptName, DeptAddress, SchoolCode)
+                  VALUES ('MKTG', 'Marketing', 'Campus Box 112C', 'COB');
+INSERT INTO DEPARTMENT (DeptCode, DeptName, DeptAddress, SchoolCode)
+                  VALUES ('MGT', 'Management', 'Campus Box 112F', 'COB');
+INSERT INTO DEPARTMENT (DeptCode, DeptName, DeptAddress, SchoolCode)
+                  VALUES ('EE', 'Electrical Engg', 'Campus Box 109D', 'COE');  
+INSERT INTO DEPARTMENT (DeptCode, DeptName, DeptAddress, SchoolCode)
+                  VALUES ('ME', 'Mechanical Engg', 'Campus Box 109K', 'COE');
+INSERT INTO DEPARTMENT (DeptCode, DeptName, DeptAddress, SchoolCode)
+                  VALUES ('CHEM', 'Chemistry', 'Campus Box 212C', 'COS');
+
+/*Adding a range constraint for the RoomCapacity column in ROOM*/
+ALTER TABLE ROOM
+ADD CONSTRAINT ValidRoomCapacity CHECK (RoomCapacity > 0 AND RoomCapacity <= 1000);
+
+/* Create Professor Table */
+
+CREATE TABLE PROFESSOR (
+ProfID CHAR(3) NOT NULL,
+ProfName VARCHAR(100) NOT NULL,
+ProfAddr VARCHAR(150) NULL,
+ProfRank VARCHAR(20) NULL,
+ProfDegree VARCHAR(20) NULL,
+ProfEmail VARCHAR(50) NOT NULL,
+DeptCode VARCHAR(4) NOT NULL,
+CONSTRAINT ProfessorPK PRIMARY KEY (ProfID),
+CONSTRAINT ProfessorFK FOREIGN KEY (DeptCode) REFERENCES DEPARTMENT (DeptCode)
+ON UPDATE CASCADE
+ON DELETE NO ACTION );
+
+/* Inserting Data into Professor Table */
+
+INSERT INTO professor (ProfId, ProfName, ProfAddr, ProfRank, ProfDegree, ProfEmail, DeptCode)
+                  VALUES ('101','John Doe', 'Campus Box 112F1', 'Prof', 'PhD', 'jd@cat.edu','MGT');
+INSERT INTO professor (ProfId, ProfName, ProfAddr, ProfRank, ProfDegree, ProfEmail, DeptCode)
+                  VALUES ('102','Emily Reese','Campus Box 112F7','Asst Prof','PhD','er@cat.edu','MGT');
+INSERT INTO professor (ProfId, ProfName, ProfAddr, ProfRank, ProfDegree, ProfEmail, DeptCode)
+                  VALUES ('103','Jill Maher','Campus Box 109D1','Asst Prof','Masters','jm@cat.edu','EE');
+INSERT INTO professor (ProfId, ProfName, ProfAddr, ProfRank, ProfDegree, ProfEmail, DeptCode)
+                  VALUES ('104','Alice Baker','Campus Box 112F9','Assoc Prof','PhD','ab@cat.edu','MGT');
+INSERT INTO professor (ProfId, ProfName, ProfAddr, ProfRank, ProfDegree, ProfEmail, DeptCode)
+                  VALUES ('105','Nick Berger','Campus Box 112A3','Assoc Prof','Masters','nb@cat.edu','ACCT');
+INSERT INTO professor (ProfId, ProfName, ProfAddr, ProfRank, ProfDegree, ProfEmail, DeptCode)
+                  VALUES ('106','Gloria Feld','Campus Box 112A9','Prof','PhD','gf@cat.edu','ACCT');
+                  
+
+/* Create Student Table */
+
+CREATE TABLE STUDENT (
+StuID CHAR(5) NOT NULL,
+StuName VARCHAR(100) NOT NULL,
+StuAddr VARCHAR(150) NULL,
+StuMajor VARCHAR(15) NULL,
+StuGPA DECIMAL(3,2) NULL,
+DeptCode VARCHAR(4) NOT NULL,
+CONSTRAINT StudentPK PRIMARY KEY (StuID),
+CONSTRAINT StudentFK FOREIGN KEY (DeptCode) REFERENCES DEPARTMENT (DeptCode)
+ON UPDATE CASCADE
+ON DELETE NO ACTION );
+
+
+/* Inserting Data into Student Table */
+
+INSERT INTO student (StuId, StuName, StuAddr, StuMajor, StuGPA, DeptCode)
+                  VALUES ('10001','Evan Niese', '202 Rockfall Ave', 'Accounting', '3.6', 'ACCT');
+INSERT INTO student (StuId, StuName, StuAddr, StuMajor, StuGPA, DeptCode)
+                  VALUES ('10002','Joe Bram','133 System Dr','Marketing','3.2','MKTG');
+INSERT INTO student (StuId, StuName, StuAddr, StuMajor, StuGPA, DeptCode)
+                  VALUES ('10003','Jane Doe','200 Lake View','Auditing','3.2','ACCT');
+INSERT INTO student (StuId, StuName, StuAddr, StuMajor, StuGPA, DeptCode)
+                  VALUES ('10004','Tiffany John','390 Rockfall Ave','Supply Chain','3.5','MGT');
+INSERT INTO student (StuId, StuName, StuAddr, StuMajor, StuGPA, DeptCode)
+                  VALUES ('10005','Nick Shine','560 Lake Dr','Chemistry','3.7','CHEM');
+INSERT INTO student (StuId, StuName, StuAddr, StuMajor, StuGPA, DeptCode)
+                  VALUES ('10006','Mary Tate','600 Castle Ln','Accounting','4.0','ACCT');             
+                  
+                  
+                  
+                  
+/* Create Artist Table */
+
+CREATE TABLE ARTIST (
+ArtID VARCHAR(5) NOT NULL,
+ArtName VARCHAR(5) NOT NULL,
+ArtStyle VARCHAR(5) NOT NULL,
+CONSTRAINT ARTISTPK PRIMARY KEY (ArtID));
+
+
+/* Inserting Data into Artist Table */
+
+INSERT INTO artist (ArtId, ArtName, ArtStyle)
+                  VALUES ('1001', 'Dali', 'Cubism');
+INSERT INTO artist (ArtId, ArtName, ArtStyle)
+                  VALUES ('1002','Pollock','Action');
+INSERT INTO artist (ArtId, ArtName, ArtStyle)
+                  VALUES ('1003','Hopper','Realism');
+                  
+                  
+/* Create Painting Table */
+
+CREATE TABLE PAINTING (
+PaintID VARCHAR(5) NOT NULL,
+PaintName VARCHAR(100) NOT NULL,
+PaintDate VARCHAR(150) NOT NULL,
+ArtID VARCHAR(5) NOT NULL,
+CONSTRAINT PaintingPK PRIMARY KEY (PaintID),
+CONSTRAINT PaintingFK FOREIGN KEY (ArtID) REFERENCES Artist (ArtID)
+ON UPDATE CASCADE
+ON DELETE NO ACTION );
+
+/* Inserting Data into PAINTING Table */
+
+INSERT INTO painting (PaintID, PaintName, PaintDate, ArtId)
+                  VALUES ('101','Colors','10/8/1930','1001');
+INSERT INTO painting (PaintID, PaintName, PaintDate, ArtId)
+                  VALUES ('102','Horses','11/5/1925','1002');
+INSERT INTO painting (PaintID, PaintName, PaintDate, ArtId)
+                  VALUES ('103','Rainbow','3/7/1920','1003');
+                  
+                  
+            
+            
+/* Create Customer Table */
+
+CREATE TABLE CUSTOMER (
+CustID VARCHAR(10) NOT NULL,
+CustName VARCHAR(100) NOT NULL,
+CustAddr VARCHAR(150) NOT NULL,
+CONSTRAINT CustomerPK PRIMARY KEY (CustID));
+
+/* Inserting Data into Customer Table */
+
+INSERT INTO customer (CustID, CustName, CustAddr)
+                  VALUES ('251','Mike Evans','504 Meadow Dr');
+INSERT INTO customer (CustID, CustName, CustAddr)
+                  VALUES ('252','Jamie Hann','1590 Cherry Ave');
+INSERT INTO customer (CustID, CustName, CustAddr)
+                  VALUES ('253','Jake Scott','325 Woodville Rd');
+                  
+                  
+                  
+/* Create the intersection Cust_Int table */
+
+CREATE TABLE CUST_INT (
+CustIntID CHAR (3) NOT NULL,
+ArtID VARCHAR (5) NOT NULL,
+CustID VARCHAR (10) NOT NULL,
+CONSTRAINT CUST_INTPK   PRIMARY KEY (CustIntID),
+CONSTRAINT CUST_INTFK1 FOREIGN KEY (ArtID) REFERENCES ARTIST (ArtID)
+                                                   ON UPDATE CASCADE
+                                                   ON DELETE NO ACTION,
+CONSTRAINT CUST_INTFK2 FOREIGN KEY (CustID) REFERENCES CUSTOMER (CustID)
+                                                 ON UPDATE CASCADE
+                                                 ON DELETE NO ACTION
+);
+
+
+/* Inserting Data into Cust_Int Table */
+
+INSERT INTO cust_int (CustIntID, ArtID, CustID)
+                  VALUES ('900','1001','251');
+INSERT INTO cust_int (CustIntID, ArtID, CustID)
+                  VALUES ('901','1002','252');
+INSERT INTO cust_int (CustIntID, ArtID, CustID)
+                  VALUES ('902','1003','253');
+                  
+
+
+/* Create the intersection Copies table */
